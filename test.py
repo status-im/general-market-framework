@@ -23,7 +23,7 @@ xorll = state.abi_contract(xorll_se)
 
 minheap.push(5)
 minheap.push(10)
-print(minheap.top())
+print(minheap.top(), minheap.size())
 
 head = tail = xorll.insert("head", 10, 0, 0)
 tail = xorll.insert("tail", 20, 0, tail)

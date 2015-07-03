@@ -2,56 +2,73 @@
 # bids and asks
 # with price, amount and trader encoded in a single 256 bit value
 
-data heap[2*256]
+data owner
+data size
+data elements[2**256]
+
+
+def init():
+    self.owner = msg.sender
 
 
 def push(item):
+    if self.owner != msg.sender:
+        stop
 
-    length = self.heap[0]
-    k = length + 1
-    self.heap[k] = item
-    log(k)
+    sz = self.size
+    self.elements[sz + 1] = item
+    k = sz + 1
     while k > 1:
-        bottom = self.heap[k]
-        top = self.heap[k/2]
+        bottom = self.elements[k]
+        top = self.elements[k/2]
         if bottom < top:
-            self.heap[k] = top
-            self.heap[k/2] = bottom
+            self.elements[k] = top
+            self.elements[k/2] = bottom
             k /= 2
         else:
             k = 0
-    self.heap[0] = k
+    self.size = sz + 1
 
 
 def pop():
-    length = self.heap[0]
-    if !length:
+    if self.owner != msg.sender:
+        stop
+
+    sz = self.size
+    if !sz:
         return(0)
-    prevtop = self.heap[1]
-    self.heap[1] = self.heap[length]
-    self.heap[length] = 0
-    top = self.heap[1]
+    prevtop = self.elements[1]
+    self.elements[1] = self.elements[sz]
+    self.elements[sz] = 0
+    top = self.elements[1]
     k = 1
-    while k * 2 < length:
-        bottom1 = self.heap[k * 2]
-        bottom2 = self.heap[k * 2 + 1]
-        if bottom1 < top and (bottom1 < bottom2 or k * 2 + 1 >= length):
-            self.heap[k] = bottom1
-            self.heap[k * 2] = top
+    while k * 2 < sz:
+        bottom1 = self.elements[k * 2]
+        bottom2 = self.elements[k * 2 + 1]
+        if bottom1 < top and (bottom1 < bottom2 or k * 2 + 1 >= sz):
+            self.elements[k] = bottom1
+            self.elements[k * 2] = top
             k = k * 2
-        elif bottom2 < top and bottom2 < bottom1 and k * 2 + 1 < length:
-            self.heap[k] = bottom2
-            self.heap[k * 2 + 1] = top
+        elif bottom2 < top and bottom2 < bottom1 and k * 2 + 1 < sz:
+            self.elements[k] = bottom2
+            self.elements[k * 2 + 1] = top
             k = k * 2 + 1
         else:
-            k = length
-    self.heap[0] = length - 1
+            k = sz
+    self.size = sz - 1
     return(prevtop)
 
 
 def top():
-    return(self.heap[1])
+    return(self.elements[1])
 
 
-def length():
-    return(self.heap[0])
+def size():
+    return(self.size)
+
+
+def set_owner(new_owner):
+    if self.owner != msg.sender:
+        stop
+
+    self.owner = new_owner
