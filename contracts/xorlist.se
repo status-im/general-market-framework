@@ -1,10 +1,27 @@
 # XOR List
 # For Trade Keys, points to hashmap for trade data
-# http://www.geeksforgeeks.org/xor-linked-list-a-memory-efficient-doubly-linked-list-set-2/
 
-data xorlist[](key)
+data head_ref
+data xorlist[](item, nxp)  # nxp = next xor previous
 data hashmap[](value)
 
 
-def xoritem():
-    return("monkey" xor "chowder")
+def init():
+    self.head_ref = 0
+
+
+def push(head_ref, item):
+    new_node_addr = head_ref xor 0
+    self.xorlist[new_node_addr].item = item
+
+    # if head_ref != 0:
+    #     self.xorlist[new_node_addr].nxp = head_ref xor 0
+
+    self.xorlist[new_node_addr].nxp = self.xorlist[self.head_ref].nxp xor 0
+    self.xorlist[self.head_ref].nxp = new_node_addr xor self.xorlist[new_node_addr].nxp
+
+    self.head_ref = new_node_addr
+
+
+def head_ref():
+    return(self.head_ref)
