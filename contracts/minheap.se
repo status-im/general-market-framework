@@ -1,0 +1,61 @@
+# Min Heap
+# bids and asks
+# with price, amount and trader encoded in a single 256 bit value
+
+data heap[2**256]
+
+
+def push(item):
+
+    length = heap[0]
+    k = length + 1
+    heap[k] = item
+    log(k)
+    while k > 1:
+        log(666)
+        bottom = heap[k]
+        top = heap[k/2]
+        log(top)
+        log(bottom)
+        if bottom < top:
+            heap[k] = top
+            heap[k/2] = bottom
+            k /= 2
+        else:
+            k = 0
+    log(k)
+    heap[0] = k
+
+
+def pop():
+    length = heap[0]
+    if !length:
+        return(0)
+    prevtop = heap[1]
+    heap[1] = heap[length]
+    heap[length] = 0
+    top = heap[1]
+    k = 1
+    while k * 2 < length:
+        bottom1 = heap[k * 2]
+        bottom2 = heap[k * 2 + 1]
+        if bottom1 < top and (bottom1 < bottom2 or k * 2 + 1 >= length):
+            heap[k] = bottom1
+            heap[k * 2] = top
+            k = k * 2
+        elif bottom2 < top and bottom2 < bottom1 and k * 2 + 1 < length:
+            heap[k] = bottom2
+            heap[k * 2 + 1] = top
+            k = k * 2 + 1
+        else:
+            k = length
+    heap[0] = length - 1
+    return(prevtop)
+
+
+def top():
+    return(heap[1])
+
+
+def length():
+    return(heap[0])

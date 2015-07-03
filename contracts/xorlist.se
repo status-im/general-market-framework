@@ -1,0 +1,10 @@
+# XOR List
+# For Trade Keys, points to hashmap for trade data
+# http://www.geeksforgeeks.org/xor-linked-list-a-memory-efficient-doubly-linked-list-set-2/
+
+data xorlist[](key)
+data hashmap[](value)
+
+
+def xoritem():
+    return("monkey" xor "chowder")
