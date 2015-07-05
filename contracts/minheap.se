@@ -63,12 +63,12 @@ def top():
     return(self.elements[1])
 
 
-def size():
-    return(self.size)
+# def size():
+#     return(self.size)
 
 
-def set_owner(new_owner):
-    if self.owner != msg.sender:
-        stop
+# def set_owner(new_owner):
+#     if self.owner != msg.sender:
+#         stop
 
-    self.owner = new_owner
+#     self.owner = new_owner

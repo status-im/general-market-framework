@@ -19,21 +19,22 @@ with open('contracts/xorll.se') as fh:
 
 
 minheap = state.abi_contract(minheap_se)
-xorll = state.abi_contract(xorll_se)
+# xorll = state.abi_contract(xorll_se)
 
-minheap.push(5)
-minheap.push(10)
-print(minheap.top(), minheap.size())
+# minheap.push(5)
+# minheap.push(2)
+# minheap.push(10)
+# print(minheap.top(), minheap.size())
 
-head = tail = xorll.insert("head", 10, 0, 0)
-tail = xorll.insert("tail", 20, 0, tail)
+# head = tail = xorll.insert("head", 10, 0, 0)
+# tail = xorll.insert("tail", 20, 0, tail)
 
-tail = xorll.insert("monkey", 30, xorll.np(tail), tail)
-tail = xorll.insert("finger", 40, xorll.np(tail), tail)
+# tail = xorll.insert("monkey", 30, xorll.np(tail), tail)
+# tail = xorll.insert("finger", 40, xorll.np(tail), tail)
 
-print('---')
-xorll.traverse(head)
-print('---')
-xorll.traverse(tail)
-print('---')
-xorll.test()
+# print('---')
+# xorll.traverse(head)
+# print('---')
+# xorll.traverse(tail)
+# print('---')
+# xorll.test()

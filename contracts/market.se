@@ -1,0 +1,86 @@
+# Market Entry Point
+
+data buy_heap
+data sell_heap
+
+data current_epoch
+
+extern minheap: [pop:_:i, push:i:_, size:_:i, top:_:i]
+
+# maybe instead of state, have different linked lists for each stage?
+data bid[](state, preferences, insurances)
+# preferences include; (only allow preferences to be added in same block number as created)
+# price
+# quantity
+# item
+# dispute contract address
+
+
+def shared():
+    QUIET_WINDOW = 1   # blocks to accept sealed bids
+    REVEAL_WINDOW = 2  # blocks in which sealed bids can be revealed
+
+
+# Initialize with [ buy_heap, sell_heap ]
+def init_market(buy_heap, sell_heap):
+    self.buy_heap = buy_heap
+    self.sell_heap = sell_heap
+    self.current_epoch = block.number / 1000
+    stop
+
+
+def tick():
+    if self.current_epoch < block.number / 100:
+        stop
+
+
+def make_bid(item, price, quantity):
+    trader = msg.sender
+    key = sha3(item + price + quantity + trader)
+    self.bid[key].trader = trader
+    self.bid[key].state = 0  # inactive
+    self.bid[key].preferences = create xorll head
+    self.bid[key].insurances = refrences of insurance that cover the price
+    return(key)
+
+
+def add_bid_preference(bidkey, key, value):
+    if msg.sender == self.bid[key].owner and self.bid[key].state = 0:
+        self.bid[key].preferences = xorll.insert()
+
+
+# make bid available for match maker to produce trade offers
+# after QUIET_WINDOW + REVEAL_WINDOW, trade offers presented to buyer,
+# trade offers attached to bid as xorll (???)
+# if buyer chooses them, confirm with seller, if seller declines penalize them?
+# if seller confirms, trade is created
+
+#maybe match maker fee should be taken as the margin, since bid and ask price are preferences of seller
+def activate_bid(key):
+    # record block number, and start QUIET_WINDOW
+    if msg.sender == self.bid[key].owner and self.bid[key].state = 0:
+        self.bid[key].state = 1  # active
+        log(key, 1)
+
+
+# assumes trader will deactive their own bid once they accept a trade offer
+def deactivate_bid(key):
+    if msg.sender == self.bid[key].owner and self.bid[key].state = 1:
+        # delete the entire entry if possible
+        self.bid[key].state = -1  # non existant
+
+
+
+
+
+# i want to add a bid, add preferences to it, launch it (announce to market matchers and add to heap )
+# then after sealed bids are revealed I want to choose an option
+# http://bitcoin.stackexchange.com/questions/38065/in-ethereum-smart-contracts-is-it-cheaper-to-keep-all-the-data-or-delete-old-da
+
+# maybe use some fifo data structure, queue? could use the xor linked list and then delete references in storage?
+# something like,
+macro delete_blah(i):
+     x = ref(blah[i].bar)
+     while x < ref(blah[i + 1].bar):
+          ~sstore(x, 0)
+          x += 1
