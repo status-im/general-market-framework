@@ -7,8 +7,12 @@ data current_epoch
 
 extern minheap: [pop:_:i, push:i:_, size:_:i, top:_:i]
 
+extern xorll.se: [insert:i:_]
+
+BID_QUEUE = create('xorll.se')
+
 # maybe instead of state, have different linked lists for each stage?
-data bid[](state, preferences, insurances)
+data bid[](state, epoch, preferences, insurances, trade_offers)
 # preferences include; (only allow preferences to be added in same block number as created)
 # price
 # quantity
@@ -34,19 +38,26 @@ def tick():
         stop
 
 
-def make_bid(item, price, quantity):
-    trader = msg.sender
-    key = sha3(item + price + quantity + trader)
-    self.bid[key].trader = trader
+def create_bid():
+    # not ideal, only one bid per block per sender
+    key = sha3(msg.sender, block.timestamp)
+    self.bid[key].trader = msg.sender
+    self.bid[key].epoch = block.timestamp
     self.bid[key].state = 0  # inactive
-    self.bid[key].preferences = create xorll head
-    self.bid[key].insurances = refrences of insurance that cover the price
+    self.bid[key].preferences = create('xorll.se')
+    self.bid[key].preferences.init()
+    self.bid[key].trade_offers = create('xorll.se')
+    self.bid[key].trade_offers.init()
+    # self.bid[key].insurances = refrences of insurance that cover the price
     return(key)
 
 
 def add_bid_preference(bidkey, key, value):
-    if msg.sender == self.bid[key].owner and self.bid[key].state = 0:
-        self.bid[key].preferences = xorll.insert()
+    # only allow owner(trader) to add preferences in same block it was created while inactive
+    if msg.sender == self.bid[bidkey].trader and self.bid[bidkey].state == 0 and self.bid[bidkey].epoch == block.timestamp:
+        tail = self.bid[bidkey].preferences.tail()
+        tail_np = self.bid[bidkey].preferences.np(tail)  # or make tail() return np in array as well
+        self.bid[bidkey].preferences.insert(key, value, tail_np, tail)
 
 
 # make bid available for match maker to produce trade offers
@@ -56,20 +67,18 @@ def add_bid_preference(bidkey, key, value):
 # if seller confirms, trade is created
 
 #maybe match maker fee should be taken as the margin, since bid and ask price are preferences of seller
-def activate_bid(key):
+def activate_bid(bidkey):
     # record block number, and start QUIET_WINDOW
-    if msg.sender == self.bid[key].owner and self.bid[key].state = 0:
-        self.bid[key].state = 1  # active
-        log(key, 1)
+    if msg.sender == self.bid[bidkey].owner and self.bid[bidkey].state = 0:
+        self.bid[bidkey].state = 1  # active
+        log(bidkey, 1) # log this bid as being active for match makers
 
 
 # assumes trader will deactive their own bid once they accept a trade offer
-def deactivate_bid(key):
-    if msg.sender == self.bid[key].owner and self.bid[key].state = 1:
+def deactivate_bid(bidkey):
+    if msg.sender == self.bid[bidkey].owner and self.bid[bidkey].state = 1:
         # delete the entire entry if possible
-        self.bid[key].state = -1  # non existant
-
-
+        self.bid[bidkey].state = -1  # non existant
 
 
 

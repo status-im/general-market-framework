@@ -1,7 +1,12 @@
 # XOR Linked List
 # For Trade Keys, points to hashmap for trade data
 
+data owner
 data xorll[](value, np)  # np = next xor previous
+
+
+def init():
+    self.owner = msg.sender
 
 
 # traverse the list given either the head or the tail
@@ -26,6 +31,11 @@ def traverse(start):  # pointer to head or tail
 
 
 def insert(pointer, value, prev, cur):
+    if msg.sender != self.owner:
+        stop
+    if self.xorll[pointer].value != 0:
+        stop
+
     self.xorll[pointer].value = value
     self.xorll[pointer].np = cur  # end node points to previous one
 
