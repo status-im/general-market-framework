@@ -4,10 +4,10 @@
 # Match Makers then commit sealed bids, which are revealed in the reveal window 
 # Buyer and Seller then accept the trade offer
 
-extern contracts/xorll.se: [insert:[int256,int256,int256,int256]:int256, np:[int256]:int256, test:[]:_, traverse:[int256]:_]
+extern xorll.se: [insert:[int256,int256,int256,int256]:int256, np:[int256]:int256, test:[]:_, traverse:[int256]:_]
 
-trade_offers = create('contracts/xorll.se')
-preferences = create('contracts/xorll.se')
+trade_offers = create('xorll.se')
+preferences = create('xorll.se')
 
 # maybe instead of state, have different linked lists for each stage?
 data trade_offers[]
@@ -37,17 +37,17 @@ def add():
     key = ticket
     ticket = ticket + 1
 
-    self.bid[key].owner = msg.sender
-    self.bid[key].epoch = block.number
-    self.bid[key].state = 0  # inactive
+    self.pool[key].owner = msg.sender
+    self.pool[key].epoch = block.number
+    self.pool[key].state = 0  # inactive
 
     # Preferences
     # Head pointer
     # TODO: Maybe insert returns np and key, maybe also use autoincrement
     head = preferences.insert("head", 0, 0, 0)
-    self.bid[key].preferences[0] = head
+    self.pool[key].preferences[0] = head
     # Tail pointer
-    self.bid[key].preferences[1] = preferences.insert("tail", 0, 0, tail)
+    self.pool[key].preferences[1] = preferences.insert("tail", 0, 0, tail)
 
     # TODO: insurance references
 
@@ -60,7 +60,8 @@ def add_preference(ticket, key, value):
         tail = self.pool[ticket].preferences[1]
         # or make tail() return np in insert as well?
         tail_np = preferences.np(tail)
-        self.bid[bidkey].preferences.insert(key, value, tail_np, tail)
+        tail = preferences.insert(key, value, tail_np, tail)
+        self.pool[ticket].preferences[1] = tail
 
 
 # make ticket available for match maker to produce trade offers
@@ -72,7 +73,7 @@ def add_preference(ticket, key, value):
 # maybe match maker fee should be taken as the margin, since bid and ask price are preferences of seller
 def activate(ticket):
     # record block number, and start QUIET_WINDOW
-    if msg.sender == self.pool[ticket].owner and self.pool[ticket].state = 0:
+    if msg.sender == self.pool[ticket].owner and self.pool[ticket].state == 0:
         self.pool[ticket].state = 1  # active
         log(ticket, 1) # log this bid as being active for match makers
 
@@ -80,9 +81,9 @@ def activate(ticket):
 # assumes trader will deactive their own bid once they accept a trade offer
 def deactivate(ticket):
     # check if trade offers have been declined or not?
-    if msg.sender == self.pool[ticket].owner and self.pool[ticket].state = 1:
+    if msg.sender == self.pool[ticket].owner and self.pool[ticket].state == 1:
         # delete the entire entry if possible
-        self.bid[bidkey].state = -1  # non existant
+        self.pool[bidkey].state = -1  # non existant
 
 
 # TODO: Remove from storage
