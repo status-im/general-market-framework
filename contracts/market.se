@@ -1,18 +1,20 @@
 # Market Entry Point
 
-data buy_heap
-data sell_heap
+# Add ticket to pool, add preferences to the ticket, activate it (announce to market matchers )
+# Match Makers then commit sealed bids, which are revealed in the reveal window 
+# Buyer and Seller then accept the trade offer
 
-data current_epoch
+extern contracts/xorll.se: [insert:[int256,int256,int256,int256]:int256, np:[int256]:int256, test:[]:_, traverse:[int256]:_]
 
-extern minheap: [pop:_:i, push:i:_, size:_:i, top:_:i]
-
-extern xorll.se: [insert:i:_]
-
-BID_QUEUE = create('xorll.se')
+trade_offers = create('contracts/xorll.se')
+preferences = create('contracts/xorll.se')
 
 # maybe instead of state, have different linked lists for each stage?
-data bid[](state, epoch, preferences, insurances, trade_offers)
+data trade_offers[]
+data pool[](owner, epoch, state, preferences[], insurances[])
+data ticket # auto increment
+
+
 # preferences include; (only allow preferences to be added in same block number as created)
 # price
 # quantity
@@ -20,76 +22,72 @@ data bid[](state, epoch, preferences, insurances, trade_offers)
 # dispute contract address
 
 
+def init():
+    ticket = 0
+
+
 def shared():
-    QUIET_WINDOW = 1   # blocks to accept sealed bids
-    REVEAL_WINDOW = 2  # blocks in which sealed bids can be revealed
+    # block offsets from ticket epoch
+    QUIET_WINDOW = 1   # to accept sealed bids
+    REVEAL_WINDOW = 2  # in which sealed bids can be revealed
 
 
-# Initialize with [ buy_heap, sell_heap ]
-def init_market(buy_heap, sell_heap):
-    self.buy_heap = buy_heap
-    self.sell_heap = sell_heap
-    self.current_epoch = block.number / 1000
-    stop
-
-
-def tick():
-    if self.current_epoch < block.number / 100:
-        stop
-
-
-def create_bid():
+def add():
     # not ideal, only one bid per block per sender
-    key = sha3(msg.sender, block.timestamp)
-    self.bid[key].trader = msg.sender
-    self.bid[key].epoch = block.timestamp
+    key = ticket
+    ticket = ticket + 1
+
+    self.bid[key].owner = msg.sender
+    self.bid[key].epoch = block.number
     self.bid[key].state = 0  # inactive
-    self.bid[key].preferences = create('xorll.se')
-    self.bid[key].preferences.init()
-    self.bid[key].trade_offers = create('xorll.se')
-    self.bid[key].trade_offers.init()
-    # self.bid[key].insurances = refrences of insurance that cover the price
+
+    # Preferences
+    # Head pointer
+    # TODO: Maybe insert returns np and key, maybe also use autoincrement
+    head = preferences.insert("head", 0, 0, 0)
+    self.bid[key].preferences[0] = head
+    # Tail pointer
+    self.bid[key].preferences[1] = preferences.insert("tail", 0, 0, tail)
+
+    # TODO: insurance references
+
     return(key)
 
 
-def add_bid_preference(bidkey, key, value):
+def add_preference(ticket, key, value):
     # only allow owner(trader) to add preferences in same block it was created while inactive
-    if msg.sender == self.bid[bidkey].trader and self.bid[bidkey].state == 0 and self.bid[bidkey].epoch == block.timestamp:
-        tail = self.bid[bidkey].preferences.tail()
-        tail_np = self.bid[bidkey].preferences.np(tail)  # or make tail() return np in array as well
+    if msg.sender == self.pool[ticket].owner and self.pool[ticket].state == 0 and self.pool[ticket].epoch == block.number:
+        tail = self.pool[ticket].preferences[1]
+        # or make tail() return np in insert as well?
+        tail_np = preferences.np(tail)
         self.bid[bidkey].preferences.insert(key, value, tail_np, tail)
 
 
-# make bid available for match maker to produce trade offers
+# make ticket available for match maker to produce trade offers
 # after QUIET_WINDOW + REVEAL_WINDOW, trade offers presented to buyer,
-# trade offers attached to bid as xorll (???)
+# TODO: how should trade offers should be attached?
 # if buyer chooses them, confirm with seller, if seller declines penalize them?
 # if seller confirms, trade is created
 
-#maybe match maker fee should be taken as the margin, since bid and ask price are preferences of seller
-def activate_bid(bidkey):
+# maybe match maker fee should be taken as the margin, since bid and ask price are preferences of seller
+def activate(ticket):
     # record block number, and start QUIET_WINDOW
-    if msg.sender == self.bid[bidkey].owner and self.bid[bidkey].state = 0:
-        self.bid[bidkey].state = 1  # active
-        log(bidkey, 1) # log this bid as being active for match makers
+    if msg.sender == self.pool[ticket].owner and self.pool[ticket].state = 0:
+        self.pool[ticket].state = 1  # active
+        log(ticket, 1) # log this bid as being active for match makers
 
 
 # assumes trader will deactive their own bid once they accept a trade offer
-def deactivate_bid(bidkey):
-    if msg.sender == self.bid[bidkey].owner and self.bid[bidkey].state = 1:
+def deactivate(ticket):
+    # check if trade offers have been declined or not?
+    if msg.sender == self.pool[ticket].owner and self.pool[ticket].state = 1:
         # delete the entire entry if possible
         self.bid[bidkey].state = -1  # non existant
 
 
-
-# i want to add a bid, add preferences to it, launch it (announce to market matchers and add to heap )
-# then after sealed bids are revealed I want to choose an option
-# http://bitcoin.stackexchange.com/questions/38065/in-ethereum-smart-contracts-is-it-cheaper-to-keep-all-the-data-or-delete-old-da
-
-# maybe use some fifo data structure, queue? could use the xor linked list and then delete references in storage?
-# something like,
-macro delete_blah(i):
-     x = ref(blah[i].bar)
-     while x < ref(blah[i + 1].bar):
-          ~sstore(x, 0)
-          x += 1
+# TODO: Remove from storage
+# macro delete_blah(i):
+#      x = ref(blah[i].bar)
+#      while x < ref(blah[i + 1].bar):
+#           ~sstore(x, 0)
+#           x += 1

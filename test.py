@@ -11,21 +11,16 @@ def listener(msg):
 
 slogging.log_listeners.listeners.append(listener)
 
-with open('contracts/minheap.se') as fh:
-    minheap_se = fh.read()
-
-with open('contracts/xorll.se') as fh:
-    xorll_se = fh.read()
+with open('contracts/market.se') as fh:
+    market_se = fh.read()
 
 
-minheap = state.abi_contract(minheap_se)
-# xorll = state.abi_contract(xorll_se)
+market = state.abi_contract(market_se)
 
-# minheap.push(5)
-# minheap.push(2)
-# minheap.push(10)
-# print(minheap.top(), minheap.size())
-
+ticket = market.add()
+print(ticket)
+ticket2 = market.add()
+print(ticket)
 # head = tail = xorll.insert("head", 10, 0, 0)
 # tail = xorll.insert("tail", 20, 0, tail)
 
