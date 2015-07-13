@@ -6,7 +6,7 @@
 
 extern xorll.se: [insert:[int256,int256,int256,int256]:int256, np:[int256]:int256, test:[]:_, traverse:[int256]:_]
 
-trade_offers = create('xorll.se')
+monkey = create('xorll.se')
 preferences = create('xorll.se')
 
 # maybe instead of state, have different linked lists for each stage?

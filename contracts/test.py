@@ -20,7 +20,9 @@ slogging.log_listeners.listeners.append(listener)
 #     market_se = fh.read()
 # market = state.abi_contract(market_se)
 
-market = state.abi_contract('contracts/market.se')
+test_contract = state.abi_contract('test.se')
+print('success')
+market = state.abi_contract('market.se')
 
 
 

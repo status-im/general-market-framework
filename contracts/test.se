@@ -1,0 +1,4 @@
+extern xorll.se: [insert:[int256,int256,int256,int256]:int256, np:[int256]:int256, test:[]:_, traverse:[int256]:_]
+
+monkey = create('xorll.se')
+preferences = create('xorll.se')
