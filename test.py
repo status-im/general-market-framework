@@ -12,15 +12,7 @@ def listener(msg):
 
 slogging.log_listeners.listeners.append(listener)
 
-
-# print(serpent.compile('contracts/market.se'))
-
-# os.chdir('contracts/')
-# with open('market.se') as fh:
-#     market_se = fh.read()
-# market = state.abi_contract(market_se)
-
-market = state.abi_contract('contracts/market.se')
+market = state.abi_contract('contracts/market.se', gas=10000000)
 
 
 
