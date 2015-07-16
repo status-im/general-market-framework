@@ -34,8 +34,8 @@ def shared():
 
 def add():
     # not ideal, only one bid per block per sender
-    key = ticket
-    ticket = ticket + 1
+    key = self.ticket
+    self.ticket = self.ticket + 1
 
     self.pool[key].owner = msg.sender
     self.pool[key].epoch = block.number
@@ -84,6 +84,19 @@ def deactivate(ticket):
     if msg.sender == self.pool[ticket].owner and self.pool[ticket].state == 1:
         # delete the entire entry if possible
         self.pool[bidkey].state = -1  # non existant
+
+# def add_sealed_offer(hash):
+#     # trade contract
+#     # dispute contract
+
+#     # add to trade_offers[]
+
+# def reveal_offer(offer_id):
+#     # check sha of offer
+
+# def accept_offer(offer_id):
+#     # within accept blockchain number bounds
+#     # if other has accepted, create trade contract?
 
 
 # TODO: Remove from storage
