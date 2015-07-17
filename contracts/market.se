@@ -10,9 +10,12 @@ monkey = create('xorll.se')
 preferences = create('xorll.se')
 
 # maybe instead of state, have different linked lists for each stage?
-data trade_offers[]
-data pool[](owner, epoch, state, preferences[], insurances[])
+data offers[2**256](owner, hash)
+data offer
+
+data pool[2**256](owner, epoch, state, preferences(head, tail), insurances[])
 data ticket # auto increment
+
 
 
 # preferences include; (only allow preferences to be added in same block number as created)
@@ -24,12 +27,13 @@ data ticket # auto increment
 
 def init():
     ticket = 0
+    offer = 0
 
 
 def shared():
     # block offsets from ticket epoch
-    QUIET_WINDOW = 1   # to accept sealed bids
-    REVEAL_WINDOW = 2  # in which sealed bids can be revealed
+    SEALED_WINDOW = 1   # to accept sealed bids
+    REVEAL_WINDOW = 2   # in which sealed bids can be revealed
 
 
 def add():
@@ -44,10 +48,10 @@ def add():
     # Preferences
     # Head pointer
     # TODO: Maybe insert returns np and key, maybe also use autoincrement
-    head = preferences.insert("head", 0, 0, 0)
-    self.pool[key].preferences[0] = head
+    head = preferences.insert("head", 10, 0, 0)
+    self.pool[key].preferences.head = head
     # Tail pointer
-    self.pool[key].preferences[1] = preferences.insert("tail", 0, 0, tail)
+    self.pool[key].preferences.tail = preferences.insert("tail", 20, 0, head)
 
     # TODO: insurance references
 
@@ -57,11 +61,11 @@ def add():
 def add_preference(ticket, key, value):
     # only allow owner(trader) to add preferences in same block it was created while inactive
     if msg.sender == self.pool[ticket].owner and self.pool[ticket].state == 0 and self.pool[ticket].epoch == block.number:
-        tail = self.pool[ticket].preferences[1]
+        tail = self.pool[ticket].preferences.tail
         # or make tail() return np in insert as well?
         tail_np = preferences.np(tail)
         tail = preferences.insert(key, value, tail_np, tail)
-        self.pool[ticket].preferences[1] = tail
+        self.pool[ticket].preferences.tail = tail
 
 
 # make ticket available for match maker to produce trade offers
@@ -75,7 +79,7 @@ def activate(ticket):
     # record block number, and start QUIET_WINDOW
     if msg.sender == self.pool[ticket].owner and self.pool[ticket].state == 0:
         self.pool[ticket].state = 1  # active
-        log(ticket, 1) # log this bid as being active for match makers
+        log(ticket, 1)  # log this bid as being active for match makers
 
 
 # assumes trader will deactive their own bid once they accept a trade offer
@@ -85,11 +89,34 @@ def deactivate(ticket):
         # delete the entire entry if possible
         self.pool[bidkey].state = -1  # non existant
 
-# def add_sealed_offer(hash):
-#     # trade contract
-#     # dispute contract
 
-#     # add to trade_offers[]
+def get_preferences(ticket):
+    log(ticket, self.pool[ticket].preferences.head)
+    preferences.traverse(self.pool[ticket].preferences.head)
+
+
+def add_sealed_offer(buy_ticket, hash):
+    # TODO, make sure not in REVEAL_WINDOW
+    epoch = self.pool[buy_ticket].epoch
+
+    # Impossible, Offer cannot be made before ticket
+    if epoch < block.number:
+        return(-1)
+
+    window = block.number - epoch
+
+    # abort if buy ticket no longer taking offers
+    if window > SEALED_WINDOW:
+        return(-1)
+
+    key = self.offer
+    self.offer = self.offer + 1
+
+    # Add Trade Offer
+    self.offers[key].owner = msg.sender
+    self.offers[key].hash = hash
+
+    return(key)
 
 # def reveal_offer(offer_id):
 #     # check sha of offer
