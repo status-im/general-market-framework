@@ -17,7 +17,8 @@ class Matchmaker:
             # TODO: get ticket preferences
 
     def __init__(self):
-        slogging.log_listeners.listeners.append(self.listener)
+        pass
+        # slogging.log_listeners.listeners.append(self.listener)
 
 match_maker = Matchmaker()
 
@@ -28,11 +29,16 @@ market.activate(buy_ticket)
 
 # Create sell ticket, add preferences, activate
 sell_ticket = market.add()
-market.add_preference(sell_ticket, "price", -5)
+market.add_preference(sell_ticket, "price", 7)
 market.activate(sell_ticket)
 
-print('reveal', market.add_sealed_offer(0))
-market.get_preferences(0)
+print('reveal', market.add_sealed_offer(0, 1))
+
+print('enumerate buy_ticket preferences')
+market.get_preferences(buy_ticket)
+
+print('enumerate sell_ticket preferences')
+market.get_preferences(sell_ticket)
 
 
 # head = tail = xorll.insert("head", 10, 0, 0)

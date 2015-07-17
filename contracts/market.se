@@ -1,21 +1,18 @@
 # Market Entry Point
 
 # Add ticket to pool, add preferences to the ticket, activate it (announce to market matchers )
-# Match Makers then commit sealed bids, which are revealed in the reveal window 
+# Match Makers then commit sealed bids, which are revealed in the reveal window
 # Buyer and Seller then accept the trade offer
 
-extern xorll.se: [insert:[int256,int256,int256,int256]:int256, np:[int256]:int256, test:[]:_, traverse:[int256]:_]
-
-monkey = create('xorll.se')
-preferences = create('xorll.se')
+# extern xorll.se: [insert:[int256,int256,int256,int256]:int256, np:[int256]:int256, test:[]:_, traverse:[int256]:_]
+inset('xorll.se')
 
 # maybe instead of state, have different linked lists for each stage?
 data offers[2**256](owner, hash)
 data offer
 
 data pool[2**256](owner, epoch, state, preferences(head, tail), insurances[])
-data ticket # auto increment
-
+data ticket  # auto increment
 
 
 # preferences include; (only allow preferences to be added in same block number as created)
@@ -48,11 +45,11 @@ def add():
     # Preferences
     # Head pointer
     # TODO: Maybe insert returns np and key, maybe also use autoincrement
-    head = preferences.insert("head", 10, 0, 0)
+    # TODO: Make sure no overlap in xorll keys (sha)
+    head = self.insert("ticket" + key, 10+key, 0, 0)
     self.pool[key].preferences.head = head
     # Tail pointer
-    self.pool[key].preferences.tail = preferences.insert("tail", 20, 0, head)
-
+    self.pool[key].preferences.tail = self.insert("tail" + key, 20, 0, head)
     # TODO: insurance references
 
     return(key)
@@ -63,8 +60,8 @@ def add_preference(ticket, key, value):
     if msg.sender == self.pool[ticket].owner and self.pool[ticket].state == 0 and self.pool[ticket].epoch == block.number:
         tail = self.pool[ticket].preferences.tail
         # or make tail() return np in insert as well?
-        tail_np = preferences.np(tail)
-        tail = preferences.insert(key, value, tail_np, tail)
+        tail_np = self.np(tail)
+        tail = self.insert(key + ticket, value, tail_np, tail)
         self.pool[ticket].preferences.tail = tail
 
 
@@ -92,7 +89,7 @@ def deactivate(ticket):
 
 def get_preferences(ticket):
     log(ticket, self.pool[ticket].preferences.head)
-    preferences.traverse(self.pool[ticket].preferences.head)
+    self.traverse(self.pool[ticket].preferences.head)
 
 
 def add_sealed_offer(buy_ticket, hash):
