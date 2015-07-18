@@ -24,32 +24,20 @@ match_maker = Matchmaker()
 
 # Create buy ticket, add preferences, activate
 buy_ticket = market.add()
-market.add_preference(buy_ticket, "price", 5)
+print('buy_ticket', buy_ticket)
+market.add_preference(buy_ticket, 'price', '5')
 market.activate(buy_ticket)
 
 # Create sell ticket, add preferences, activate
 sell_ticket = market.add()
-market.add_preference(sell_ticket, "price", 7)
+print('sell_ticket', sell_ticket)
+market.add_preference(sell_ticket, 'price', '-7') # TODO: handle negative numbers
 market.activate(sell_ticket)
 
-print('reveal', market.add_sealed_offer(0, 1))
+# print('reveal', market.add_sealed_offer(0, 1))
 
 print('enumerate buy_ticket preferences')
 market.get_preferences(buy_ticket)
 
 print('enumerate sell_ticket preferences')
 market.get_preferences(sell_ticket)
-
-
-# head = tail = xorll.insert("head", 10, 0, 0)
-# tail = xorll.insert("tail", 20, 0, tail)
-
-# tail = xorll.insert("monkey", 30, xorll.np(tail), tail)
-# tail = xorll.insert("finger", 40, xorll.np(tail), tail)
-
-# print('---')
-# xorll.traverse(head)
-# print('---')
-# xorll.traverse(tail)
-# print('---')
-# xorll.test()

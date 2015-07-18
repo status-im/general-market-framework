@@ -6,7 +6,6 @@ data xorll[](value, np)  # np = next xor previous
 
 # traverse the list given either the head or the tail
 def traverse(start):  # pointer to head or tail
-    log(666, start)
     cur = start
     prev = start
 
@@ -26,8 +25,8 @@ def traverse(start):  # pointer to head or tail
 
 
 def insert(pointer, value, prev, cur):
-    if self.xorll[pointer].value != 0:
-        stop
+    # if self.xorll[pointer].value != 0:
+    #     stop
 
     self.xorll[pointer].value = value
     self.xorll[pointer].np = cur  # end node points to previous one
