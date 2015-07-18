@@ -1,7 +1,7 @@
 # XOR Linked List
 # For Trade Keys, points to hashmap for trade data
 
-data xorll[](key, value, np)  # np = next xor previous
+data xorll[2**256](key, value, np)  # np = next xor previous
 data xorll_addr
 
 

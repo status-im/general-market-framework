@@ -6,6 +6,7 @@ import os
 state = tester.state()
 
 # Create Market Contract
+# TODO: remove gas
 market = state.abi_contract('contracts/market.se', gas=10000000)
 
 

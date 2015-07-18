@@ -15,21 +15,22 @@ data pool[2**256](owner, epoch, state, preferences(head, tail), insurances[])
 data ticket  # auto increment
 
 
-# preferences include; (only allow preferences to be added in same block number as created)
+# example preferences include;
 # price
 # quantity
 # item
+# trade contract address
 # dispute contract address
 
 
 def init():
     self.ticket = 0
     self.offer = 0
-    self.xorll_addr = 1 # referenced in xorll.se, can't be 0
+    self.xorll_addr = 1  # referenced in xorll.se, can't be 0
 
 
 def shared():
-    # block offsets from ticket epoch
+    # block window offsets from ticket epoch
     SEALED_WINDOW = 1   # to accept sealed bids
     REVEAL_WINDOW = 2   # in which sealed bids can be revealed
 
@@ -44,7 +45,7 @@ def add():
 
     # Preferences
     # Head pointer
-    # TODO: Maybe insert returns np and key, maybe also use autoincrement
+    # TODO: Maybe insert returns np and key
     # TODO: remove head tail xorll preamble
     # TODO: store tail_np, then if self.pool[ticket].preferences.head == 0 
     #       in insert method, take tail_np and head, then set as head.
@@ -68,10 +69,12 @@ def add_preference(ticket, key, value):
 
 
 # make ticket available for match maker to produce trade offers
-# after QUIET_WINDOW + REVEAL_WINDOW, trade offers presented to buyer,
+# after QUIET_WINDOW + REVEAL_WINDOW, trade offers presented to traders,
+# TODO: how to present reveal offers to trader? over whisper?
 # TODO: how should trade offers should be attached?
 # if buyer chooses them, confirm with seller, if seller declines penalize them?
-# if seller confirms, trade is created
+# if seller confirms, trade is created, and cleanup begins?
+# alternatively match maker collects their fee, cleanup begins?
 
 # maybe match maker fee should be taken as the margin, since bid and ask price are preferences of seller
 def activate(ticket):
