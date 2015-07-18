@@ -23,8 +23,9 @@ data ticket  # auto increment
 
 
 def init():
-    ticket = 0
-    offer = 0
+    self.ticket = 0
+    self.offer = 0
+    self.xorll_addr = 1 # referenced in xorll.se, can't be 0
 
 
 def shared():
@@ -44,11 +45,14 @@ def add():
     # Preferences
     # Head pointer
     # TODO: Maybe insert returns np and key, maybe also use autoincrement
-    # TODO: Make SHA3 happen in insert, save label, maybe can use autoincrement for pointers instead of hash?
-    head = self.insert(sha3(ticket + "head"), 10+ticket, 0, 0)
+    # TODO: remove head tail xorll preamble
+    # TODO: store tail_np, then if self.pool[ticket].preferences.head == 0 
+    #       in insert method, take tail_np and head, then set as head.
+    #       then do tail on next insert.
+    head = self.insert("head", 10+ticket, 0, 0)
     self.pool[ticket].preferences.head = head
     # Tail pointer
-    self.pool[ticket].preferences.tail = self.insert(sha3(ticket + "tail"), 20, 0, head)
+    self.pool[ticket].preferences.tail = self.insert("tail", 20, 0, head)
     # TODO: insurance references
     return(ticket)
 
@@ -59,7 +63,7 @@ def add_preference(ticket, key, value):
         tail = self.pool[ticket].preferences.tail
         # or make tail() return np in insert as well?
         tail_np = self.np(tail)
-        tail = self.insert(sha3(ticket + key), value, tail_np, tail)
+        tail = self.insert(key, value, tail_np, tail)
         self.pool[ticket].preferences.tail = tail
 
 

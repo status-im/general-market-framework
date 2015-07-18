@@ -1,7 +1,8 @@
 # XOR Linked List
 # For Trade Keys, points to hashmap for trade data
 
-data xorll[](value, np)  # np = next xor previous
+data xorll[](key, value, np)  # np = next xor previous
+data xorll_addr
 
 
 # traverse the list given either the head or the tail
@@ -10,7 +11,7 @@ def traverse(start):  # pointer to head or tail
     prev = start
 
     while self.xorll[cur].value:
-        log(self.xorll[cur].value)
+        log(self.xorll[cur].key, self.xorll[cur].value)
 
         if self.xorll[cur].np == cur:
             # finished
@@ -24,10 +25,13 @@ def traverse(start):  # pointer to head or tail
             prev = tmp
 
 
-def insert(pointer, value, prev, cur):
+def insert(key, value, prev, cur):
     # if self.xorll[pointer].value != 0:
     #     stop
+    pointer = self.xorll_addr
+    self.xorll_addr = self.xorll_addr + 1
 
+    self.xorll[pointer].key = key
     self.xorll[pointer].value = value
     self.xorll[pointer].np = cur  # end node points to previous one
 
