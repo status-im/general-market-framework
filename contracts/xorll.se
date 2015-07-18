@@ -7,6 +7,9 @@ data xorll_addr
 
 # traverse the list given either the head or the tail
 def traverse(start):  # pointer to head or tail
+    if msg.sender != self:
+        stop
+
     cur = start
     prev = start
 
@@ -26,6 +29,8 @@ def traverse(start):  # pointer to head or tail
 
 
 def insert(key, value, prev, cur):
+    if msg.sender != self:
+        stop
     # if self.xorll[pointer].value != 0:
     #     stop
     pointer = self.xorll_addr
@@ -48,13 +53,15 @@ def insert(key, value, prev, cur):
 
 
 def np(pointer):
+    if msg.sender != self:
+        stop
     return self.xorll[pointer].np
 
 
-def test():
-    head = self.insert("head", 10, 0, 0)
-    tail = head
-    tail = self.insert("tail", 20, 0, tail)
-    tail = self.insert("monkey", 30, self.np(tail), tail)
-    tail = self.insert("finger", 40, self.np(tail), tail)
-    self.traverse(tail)
+# def test():
+#     head = self.insert("head", 10, 0, 0)
+#     tail = head
+#     tail = self.insert("tail", 20, 0, tail)
+#     tail = self.insert("monkey", 30, self.np(tail), tail)
+#     tail = self.insert("finger", 40, self.np(tail), tail)
+#     self.traverse(tail)
