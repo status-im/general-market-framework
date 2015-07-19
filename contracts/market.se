@@ -74,7 +74,7 @@ def add_preference(ticket, key, value):
 
 
 # make ticket available for match maker to produce trade offers
-# after QUIET_WINDOW + REVEAL_WINDOW, trade offers presented to traders,
+# after SEALED_WINDOW + REVEAL_WINDOW, trade offers presented to traders,
 # TODO: how to present reveal offers to trader? over whisper?
 # TODO: how should trade offers should be attached?
 # if buyer chooses them, confirm with seller, if seller declines penalize them?
@@ -83,7 +83,7 @@ def add_preference(ticket, key, value):
 
 # maybe match maker fee should be taken as the margin, since bid and ask price are preferences of seller
 def activate(ticket):
-    # record block number, and start QUIET_WINDOW
+    # record block number, and start SEALED_WINDOW
     if msg.sender == self.pool[ticket].owner and self.pool[ticket].state == 0:
         self.pool[ticket].state = 1  # active
         log('announce', ticket)  # log this bid as being active for match makers
@@ -99,6 +99,7 @@ def deactivate(ticket):
 
 def get_info(ticket):
     return([self.pool[ticket].owner, self.pool[ticket].epoch, self.pool[ticket].state]:arr)
+
 
 def get_preferences(ticket):
     # TODO look at outitems clearly
