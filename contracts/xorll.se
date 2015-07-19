@@ -11,7 +11,7 @@ macro private($x):
 # traverse the list given either the head or the tail
 def traverse(start):  # pointer to head or tail
     private:
-        output = array(256)
+        output = array(64)
         i = 0
         cur = start
         prev = start
@@ -32,7 +32,7 @@ def traverse(start):  # pointer to head or tail
                 tmp = cur
                 cur = prev xor self.xorll[cur].np
                 prev = tmp
-        return(slice(output, items=0, items=256):arr)
+        return(output:arr)
 
 
 def insert(key, value, prev, cur):

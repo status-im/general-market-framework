@@ -97,6 +97,9 @@ def deactivate(ticket):
         self.pool[bidkey].state = -1  # non existant
 
 
+def get_info(ticket):
+    return([self.pool[ticket].owner, self.pool[ticket].epoch, self.pool[ticket].state]:arr)
+
 def get_preferences(ticket):
     # TODO look at outitems clearly
     return(self.traverse(self.pool[ticket].preferences.head, outitems=256):arr)
