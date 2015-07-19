@@ -13,6 +13,7 @@ market = state.abi_contract('contracts/market.se', gas=10000000)
 # Create Match Maker
 class Matchmaker:
     def announce(self, data):
+        ''' A new ticket has arrived '''
         ticket = data[0]
         info = market.get_info(ticket)
         preferences = market.get_preferences(ticket)
@@ -37,8 +38,9 @@ class Matchmaker:
         self.market = market
         slogging.log_listeners.listeners.append(self.listener)
 
-market = '\xc3\x05\xc9\x01\x07\x87\x81\xc22\xa2\xa5!\xc2\xafy\x80\xf88^\xe9'
-match_maker = Matchmaker(market)
+# TODO: Confirm this is correct?
+market_addr = '\xc3\x05\xc9\x01\x07\x87\x81\xc22\xa2\xa5!\xc2\xafy\x80\xf88^\xe9'
+match_maker = Matchmaker(market_addr)
 
 # Create buy ticket, add preferences, activate
 buy_ticket = market.add()
