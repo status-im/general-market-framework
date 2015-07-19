@@ -12,6 +12,10 @@ market = state.abi_contract('contracts/market.se', gas=10000000)
 
 # Create Match Maker
 class Matchmaker:
+
+    def new_block(self, block):
+        print('new block', block)
+
     def announce(self, data):
         ''' A new ticket has arrived '''
         ticket = data[0]
@@ -25,22 +29,32 @@ class Matchmaker:
         '''
         Dynamically call Methods based on first param
         Currently only announce exists
+
+        Also iterates on blocks
         '''
-        if msg['event'] == 'LOG' and msg['to'] == self.market:
+        event = msg['event']
+        if event == 'LOG' and msg['to'] == self.market:
             msg_type = utils.encode_int(msg['topics'][0]).rstrip('\x00')
             msg_data = msg['topics'][1:]
             try:
                 getattr(self, msg_type)(msg_data)
             except:
                 raise NotImplementedError(msg_type, msg_data)
+        elif event == 'delta':
+            if self.current_block < state.block.number:
+                self.current_block = state.block.number
+                self.new_block(state.block.number)
 
     def __init__(self, market):
         self.market = market
+        self.current_block = -1
         slogging.log_listeners.listeners.append(self.listener)
 
 # TODO: Confirm this is correct?
 market_addr = '\xc3\x05\xc9\x01\x07\x87\x81\xc22\xa2\xa5!\xc2\xafy\x80\xf88^\xe9'
 match_maker = Matchmaker(market_addr)
+
+state.mine(n=1)
 
 # Create buy ticket, add preferences, activate
 buy_ticket = market.add()
