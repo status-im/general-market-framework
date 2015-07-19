@@ -4,58 +4,63 @@
 data xorll[2**256](key, value, np)  # np = next xor previous
 data xorll_addr
 
+macro private($x):
+    if msg.sender == self:
+        $x
 
 # traverse the list given either the head or the tail
 def traverse(start):  # pointer to head or tail
-    if msg.sender != self:
-        stop
+    private:
+        output = array(256)
+        i = 0
+        cur = start
+        prev = start
 
-    cur = start
-    prev = start
+        while self.xorll[cur].value:
+            output[i] = self.xorll[cur].key
+            output[i + 1] = self.xorll[cur].value
+            i = i + 2
+            # log(self.xorll[cur].key, self.xorll[cur].value)
 
-    while self.xorll[cur].value:
-        log(self.xorll[cur].key, self.xorll[cur].value)
+            if self.xorll[cur].np == cur:
+                # finished
+                break
 
-        if self.xorll[cur].np == cur:
-            # finished
-            break
-
-        if cur == prev:
-            cur = self.xorll[cur].np
-        else:
-            tmp = cur
-            cur = prev xor self.xorll[cur].np
-            prev = tmp
+            if cur == prev:
+                cur = self.xorll[cur].np
+            else:
+                tmp = cur
+                cur = prev xor self.xorll[cur].np
+                prev = tmp
+        return(slice(output, items=0, items=256):arr)
 
 
 def insert(key, value, prev, cur):
-    if msg.sender != self:
-        stop
-    # if self.xorll[pointer].value != 0:
-    #     stop
-    pointer = self.xorll_addr
-    self.xorll_addr = self.xorll_addr + 1
+    private:
+        # if self.xorll[pointer].value != 0:
+        #     stop
+        pointer = self.xorll_addr
+        self.xorll_addr = self.xorll_addr + 1
 
-    self.xorll[pointer].key = key
-    self.xorll[pointer].value = value
-    self.xorll[pointer].np = cur  # end node points to previous one
+        self.xorll[pointer].key = key
+        self.xorll[pointer].value = value
+        self.xorll[pointer].np = cur  # end node points to previous one
 
-    if cur == 0:
+        if cur == 0:
+            return pointer
+            # end node, return
+        elif prev == 0:
+            # this is the second node (they point at each other)
+            self.xorll[cur].np = pointer
+            self.xorll[pointer].np = cur
+        else:
+            self.xorll[cur].np = prev xor pointer
         return pointer
-        # end node, return
-    elif prev == 0:
-        # this is the second node (they point at each other)
-        self.xorll[cur].np = pointer
-        self.xorll[pointer].np = cur
-    else:
-        self.xorll[cur].np = prev xor pointer
-    return pointer
 
 
 def np(pointer):
-    if msg.sender != self:
-        stop
-    return self.xorll[pointer].np
+    private:
+        return self.xorll[pointer].np
 
 
 # def test():

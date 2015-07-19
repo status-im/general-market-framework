@@ -46,14 +46,12 @@ def add():
     # Preferences
     # Head pointer
     # TODO: Maybe insert returns np and key
-    # TODO: remove head tail xorll preamble
-    # TODO: store tail_np, then if self.pool[ticket].preferences.head == 0 
-    #       in insert method, take tail_np and head, then set as head.
-    #       then do tail on next insert.
-    head = self.insert("head", 10+ticket, 0, 0)
-    self.pool[ticket].preferences.head = head
+
+    # keeping this here incase i messed up preamble in add_preference
+    # head = self.insert("head", 10+ticket, 0, 0)
+    # self.pool[ticket].preferences.head = head
     # Tail pointer
-    self.pool[ticket].preferences.tail = self.insert("tail", 20, 0, head)
+    # self.pool[ticket].preferences.tail = self.insert("tail", 20, 0, head)
     # TODO: insurance references
     return(ticket)
 
@@ -63,8 +61,14 @@ def add_preference(ticket, key, value):
     if msg.sender == self.pool[ticket].owner and self.pool[ticket].state == 0 and self.pool[ticket].epoch == block.number:
         tail = self.pool[ticket].preferences.tail
         # or make tail() return np in insert as well?
-        tail_np = self.np(tail)
+        if tail == 0:
+            tail_np = 0
+        else:
+            tail_np = self.np(tail)
+
         tail = self.insert(key, value, tail_np, tail)
+        if self.pool[ticket].preferences.head == 0:
+            self.pool[ticket].preferences.head = tail
         self.pool[ticket].preferences.tail = tail
 
 
@@ -81,7 +85,7 @@ def activate(ticket):
     # record block number, and start QUIET_WINDOW
     if msg.sender == self.pool[ticket].owner and self.pool[ticket].state == 0:
         self.pool[ticket].state = 1  # active
-        log(ticket, 1)  # log this bid as being active for match makers
+        log('announce', ticket)  # log this bid as being active for match makers
 
 
 # assumes trader will deactive their own bid once they accept a trade offer
@@ -93,7 +97,8 @@ def deactivate(ticket):
 
 
 def get_preferences(ticket):
-    self.traverse(self.pool[ticket].preferences.head)
+    # TODO look at outitems clearly
+    return(self.traverse(self.pool[ticket].preferences.head, outitems=256):arr)
 
 
 def add_sealed_offer(buy_ticket, hash):
