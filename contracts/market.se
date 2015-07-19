@@ -35,6 +35,7 @@ def shared():
     REVEAL_WINDOW = 2   # in which sealed bids can be revealed
 
 
+# TODO: can't add ticket without paying fee (for match maker/garbage collector)?
 def add():
     ticket = self.ticket
     self.ticket = self.ticket + 1
