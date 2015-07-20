@@ -129,8 +129,10 @@ def add_sealed_offer(buy_ticket, hash):
 
     return(key)
 
-# def reveal_offer(offer_id):
-#     # check sha of offer
+def reveal_offer(offer_id):
+    # TODO: maybe should be done over whisper?
+    log('reveal')  # TODO reveal for buyer/seller
+    # check sha of offer
 
 # def accept_offer(offer_id):
 #     # within accept blockchain number bounds

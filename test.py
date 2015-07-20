@@ -5,6 +5,7 @@ import os
 from collections import namedtuple
 
 Ticket = namedtuple("Ticket", "id owner epoch preferences")
+Offer = namedtuple("Offer", "id epoch buyer seller hash preferences")
 
 state = tester.state()
 
@@ -18,17 +19,32 @@ class Matchmaker:
 
     buyers = []
     sellers = []
+
+    sealed_offers = []
+
     current_block = -1
 
+    def reveal_offers(self):
+        for offer in self.sealed_offers:
+            # TODO: submit if in REVEAL_WINDOW
+            # market.reveal_offer()
+            pass
+
     def make_match(self, buyer, seller):
-        # add sealed offers
-        shasum = utils.sha3([buyer, seller])
         print('making match', buyer, seller)
-        print('hash', shasum)
-        print('reveal', market.add_sealed_offer(buyer.id, shasum))
+        # TODO: check hash for adding sealed offer, ie hash preferences?
+        shasum = utils.sha3([buyer.epoch, buyer.owner, seller.owner])
+        # TODO check epoch against SEALED_WINDOW
+        offer_id = market.add_sealed_offer(buyer.id, shasum)
+        print('shasum', shasum)
+        print('reveal', offer_id)
+
+        # TODO, combine preferences
+        offer = Offer(offer_id, buyer.epoch, buyer.owner, seller.owner, shasum, buyer.preferences)
+        self.sealed_offers.append(offer)
+
 
     def process(self):
-        # TODO:
         # naively make matches
         for s in self.sellers:
             for b in self.buyers:
@@ -37,6 +53,8 @@ class Matchmaker:
                     self.sellers.remove(s)
                     self.buyers.remove(b)
                     self.make_match(b, s)
+        self.reveal_offers()
+        # TODO:
         # reveal offers
         # do cleanup
         print('processing on block', self.current_block)
@@ -90,9 +108,7 @@ class Matchmaker:
         self.market = market
         slogging.log_listeners.listeners.append(self.listener)
 
-# TODO: Confirm this is correct?
-market_addr = '\xc3\x05\xc9\x01\x07\x87\x81\xc22\xa2\xa5!\xc2\xafy\x80\xf88^\xe9'
-match_maker = Matchmaker(market_addr)
+match_maker = Matchmaker(market.address)
 
 # Create buy ticket, add preferences, activate
 buy_ticket = market.add()
