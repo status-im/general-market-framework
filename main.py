@@ -5,6 +5,7 @@ from ethereum import tester
 import os
 
 from matchmaker import Matchmaker
+from trader import Trader
 
 state = tester.state()
 
@@ -12,30 +13,14 @@ state = tester.state()
 # TODO: remove gas
 market = state.abi_contract('contracts/market.se', gas=10000000)
 
-# Create Match Maker
-match_maker = Matchmaker(state, market)
+# Create Actors
+match_maker = Matchmaker(state, market, name='MatchMaker')
+buyer = Trader(state, market, name='Buyer')
+seller = Trader(state, market, name='Seller')
 
-# Create buy ticket, add preferences, activate
-buy_ticket = market.add()
-market.add_preference(buy_ticket, 'head', 10)
-market.add_preference(buy_ticket, 'tail', 20)
-market.add_preference(buy_ticket, 'price', 5)
-market.activate(buy_ticket)
+# Setup our simple Buy and Sell tickets
+buyer.new_ticket(5)
+seller.new_ticket(-5)
 
-# Create sell ticket, add preferences, activate
-sell_ticket = market.add()
-market.add_preference(sell_ticket, 'price', -5)
-market.activate(sell_ticket)
-
-# Move into Sealed Window
-print('sealed window')
-state.mine(n=1)
-
-# Move into Reveal Window
-print('reveal window')
-state.mine(n=2)
-
-print('accept window')
-# Move into Accept Window
-state.mine(n=1)
-print('fin')
+# Run the Network!
+state.mine(n=20)

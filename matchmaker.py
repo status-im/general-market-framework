@@ -9,6 +9,8 @@ Offer = namedtuple("Offer", "id epoch buyer seller hash preferences")
 
 class Matchmaker:
 
+    name = ''
+
     buyers = []
     sellers = []
 
@@ -23,7 +25,7 @@ class Matchmaker:
             pass
 
     def make_match(self, buyer, seller):
-        print('making match', buyer, seller)
+        print('making sealed offer', buyer, seller)
         # TODO: check hash for adding sealed offer, ie hash preferences?
         shasum = utils.sha3([buyer.epoch, buyer.owner, seller.owner])
         # TODO check epoch against SEALED_WINDOW
@@ -34,7 +36,6 @@ class Matchmaker:
         # TODO, combine preferences
         offer = Offer(offer_id, buyer.epoch, buyer.owner, seller.owner, shasum, buyer.preferences)
         self.sealed_offers.append(offer)
-
 
     def process(self):
         # naively make matches
@@ -49,7 +50,7 @@ class Matchmaker:
         # TODO:
         # reveal offers
         # do cleanup
-        print('processing on block', self.current_block)
+        print(self.name, 'processing on block', self.current_block)
 
     def announce(self, data):
         ''' A new ticket has arrived '''
@@ -87,16 +88,15 @@ class Matchmaker:
         if event == 'LOG' and msg['to'] == self.market.address:
             msg_type = utils.encode_int(msg['topics'][0]).rstrip('\x00')
             msg_data = msg['topics'][1:]
-            # try:
-            getattr(self, msg_type)(msg_data)
-            # except:
-            #     raise NotImplementedError(msg_type, msg_data)
+            if hasattr(self, msg_type):
+                getattr(self, msg_type)(msg_data)
         elif event == 'delta':
             if self.current_block < self.state.block.number:
                 self.current_block = self.state.block.number
                 self.process()
 
-    def __init__(self, state, market):
+    def __init__(self, state, market, name=''):
         self.state = state
         self.market = market
+        self.name = name
         slogging.log_listeners.listeners.append(self.listener)
