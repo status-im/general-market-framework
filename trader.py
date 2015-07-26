@@ -13,6 +13,15 @@ class Trader:
 
     current_block = -1
 
+    def reveal(self, data):
+        owner = data[0]
+        ticket_id = data[1]
+        offer = data[2]
+        if ticket_id == self.ticket.id:
+            print(self.name, 'reveal announce', ticket_id, offer)
+
+            # TODO: Look at offer, accept or decline
+
     def new_ticket(self, price):
         ticket_id = self.market.add()
         # self.market.add_preference(ticket, 'head', 10)

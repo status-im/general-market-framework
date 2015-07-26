@@ -4,7 +4,7 @@ from ethereum import slogging, utils
 from collections import namedtuple
 
 Ticket = namedtuple("Ticket", "id owner epoch preferences")
-Offer = namedtuple("Offer", "id epoch buyer seller hash preferences")
+Offer = namedtuple("Offer", "id epoch buy_id sell_id hash preferences")
 
 
 class Matchmaker:
@@ -20,29 +20,34 @@ class Matchmaker:
 
     def reveal_offers(self):
         for offer in self.sealed_offers:
-            # TODO: submit if in REVEAL_WINDOW
-            # self.market.reveal_offer()
-            pass
+            win_min = offer.epoch + self.SEALED_WINDOW
+            win_max = win_min + self.REVEAL_WINDOW
+            can_reveal = self.current_block > win_min and self.current_block < win_max
+
+            if can_reveal:
+                print(self.name, 'revealing offer', offer.id)
+                self.market.reveal_offer(offer.id, offer.hash, offer.buy_id, offer.sell_id) # TODO preferences
+                self.sealed_offers.remove(offer)
 
     def make_match(self, buyer, seller):
-        print('making sealed offer', buyer, seller)
-        # TODO: check hash for adding sealed offer, ie hash preferences?
-        shasum = utils.sha3([buyer.epoch, buyer.owner, seller.owner])
-        # TODO check epoch against SEALED_WINDOW
-        offer_id = self.market.add_sealed_offer(buyer.id, shasum)
-        print('shasum', shasum)
-        print('reveal', offer_id)
+        if buyer.epoch < self.current_block + self.SEALED_WINDOW:
+            print(self.name, 'making sealed offer', buyer.id, seller.id)
+            # TODO: check hash for adding sealed offer, ie hash preferences?
+            shasum = utils.sha3([buyer.epoch, buyer.id, seller.id])
+            # TODO check epoch against SEALED_WINDOW
+            offer_id = self.market.add_sealed_offer(buyer.id, shasum)
+            print(self.name, 'shasum', shasum)
 
-        # TODO, combine preferences
-        offer = Offer(offer_id, buyer.epoch, buyer.owner, seller.owner, shasum, buyer.preferences)
-        self.sealed_offers.append(offer)
+            # TODO, combine preferences
+            offer = Offer(offer_id, buyer.epoch, buyer.id, seller.id, shasum, buyer.preferences)
+            self.sealed_offers.append(offer)
 
     def process(self):
         # naively make matches
         for s in self.sellers:
             for b in self.buyers:
                 for k, v in s.preferences.viewitems() & b.preferences.viewitems():
-                    print('match found on', k, v)
+                    print(self.name, 'match found on', k, v)
                     self.sellers.remove(s)
                     self.buyers.remove(b)
                     self.make_match(b, s)
@@ -99,4 +104,10 @@ class Matchmaker:
         self.state = state
         self.market = market
         self.name = name
+
+        windows = self.market.get_windows()
+
+        self.SEALED_WINDOW = windows[0]
+        self.REVEAL_WINDOW = windows[1]
+
         slogging.log_listeners.listeners.append(self.listener)
