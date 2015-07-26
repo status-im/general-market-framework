@@ -134,17 +134,20 @@ def add_sealed_offer(buy_ticket, hash):
     return(key)
 
 
-def reveal_offer(id, hash, buy_ticket, sell_ticket):  # , preferences TODO
+def reveal_offer(id, buy_ticket, sell_ticket, sha_proof:arr):  # , preferences TODO
     # TODO: maybe should be done over whisper?
     # TODO: compare hash against hash of preferences
     # TODO: ensure offer is valid
-    buyer = self.get_info(buy_ticket, outitems=1)[0]
-    seller = self.get_info(sell_ticket, outitems=1)[0]
+    if self.offers[id].owner == msg.sender:
+        #  TODO: in reveal window?
+        hash = sha3(sha_proof:arr)
+        if hash == self.offers[id].hash:
+            buyer = self.get_info(buy_ticket, outitems=1)[0]
+            seller = self.get_info(sell_ticket, outitems=1)[0]
 
-    # TODO reveal for buyer/seller
-    log('reveal', buyer,  buy_ticket, id)
-    log('reveal', seller, sell_ticket, id)
-    # check sha of offer
+            # TODO reveal for buyer/seller
+            log('reveal', buyer,  buy_ticket, id)
+            log('reveal', seller, sell_ticket, id)
 
 # def accept_offer(offer_id):
 #     # within accept blockchain number bounds

@@ -18,6 +18,9 @@ class Matchmaker:
 
     current_block = -1
 
+    def debug(self, data):
+        print('debug', data)
+
     def reveal_offers(self):
         for offer in self.sealed_offers:
             win_min = offer.epoch + self.SEALED_WINDOW
@@ -26,19 +29,25 @@ class Matchmaker:
 
             if can_reveal:
                 print(self.name, 'revealing offer', offer.id)
-                self.market.reveal_offer(offer.id, offer.hash, offer.buy_id, offer.sell_id) # TODO preferences
+                # can probably encode all information in the proof
+                sha_proof = [offer.epoch, offer.buy_id, offer.sell_id]
+                self.market.reveal_offer(offer.id, offer.buy_id, offer.sell_id, sha_proof) # TODO preferences
                 self.sealed_offers.remove(offer)
 
     def make_match(self, buyer, seller):
         if buyer.epoch < self.current_block + self.SEALED_WINDOW:
             print(self.name, 'making sealed offer', buyer.id, seller.id)
             # TODO: check hash for adding sealed offer, ie hash preferences?
-            shasum = utils.sha3([buyer.epoch, buyer.id, seller.id])
+            # TODO: rework this, see reveal
+            hash_arr = [buyer.epoch, buyer.id, seller.id]
+            shasum = utils.sha3(''.join(map(lambda x: utils.zpad(utils.encode_int(x), 32), hash_arr)))
+            # shasum = utils.sha3(hash_arr)
             # TODO check epoch against SEALED_WINDOW
             offer_id = self.market.add_sealed_offer(buyer.id, shasum)
-            print(self.name, 'shasum', shasum)
+            print(self.name, 'shasum', utils.decode_int(shasum))
 
             # TODO, combine preferences
+            # TODO rework this, can probably just have buyer and seller instead of id's only
             offer = Offer(offer_id, buyer.epoch, buyer.id, seller.id, shasum, buyer.preferences)
             self.sealed_offers.append(offer)
 
