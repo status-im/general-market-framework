@@ -26,8 +26,6 @@ seller.new_ticket(-5)
 state.mine(n=5)
 
 # TODO:
-# Matchmaker wait until can reveal bid
-# Traders get notified of their tickets ( and ticket owner addr ?)
 # Traders Accept (or Decline )
 # Matchmaker waits until accept window is over and collects fees?
 # do they collect fees or do they get the option to add new sealed bids using the freed storage?

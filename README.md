@@ -1,14 +1,34 @@
 General Market Framework
 =================================
 
-_Last Updated: 18 July 2015_  
-_Copyright © 2015 Jarrad Hope_
+_Last Updated: 30 July 2015_  
+_Author: Jarrad Hope_
 
-GMF is generalised market designed to be the backbone to "sharing economy" services, our examples will include a Car Ride service & a Fiat/Cryptocurrency exchange service.
+Our goal for GMF is to create generalised market designed to be the backbone to "sharing economy" services, our examples will include a Car Ride service & a Fiat/Cryptocurrency exchange service.
 
+Traders add tickets to the pool with their preferences(price, dispute contract address, trade contract address, etc), covering their ticket price with insurance references(from [TrustDavis](https://github.com/syng-io/trustdavis)), 
 
-Traders add tickets to the pool with their preferences(price, dispute contract address, trade contract address, etc) and a bounty, covering their ticket price with insurance references(from trustdavis), match makers add sealed offers that match traders, when revealed the buyer & seller have the option accept or decline, only when both accepted will a trade contract be created.
+Match Makers are used to pair the Traders, adding sealed offers that match, when revealed (or after sealed bid TBD) the Traders have the option accept or decline the match, only when both accepted will a trade contract be created.
 
-### 0. Match Makers
+### Development Status
 
-<TODO>
+In Development (pre-alpha)
+
+- `<incomplete>`
+- Build a Frontend around GMF ([MOVΞ](https://github.com/syng-io/move))
+- Figure out Economics, ie fee's for matches
+- How to handle declines/timeouts, clean up
+- Create Trade on accepts
+- <del>Reveal & Announce</del>
+- <del>Add Sealed Bid</del>
+- <del>Naive Match Maker</del>
+- <del>Preferences Added</del>
+- <del>XOR Linked List</del>
+
+### Communication
+
+Live Chat: [gitter.im/syng-io/general](http://gitter.im/syng-io/general)
+
+### Technical Skills Required to Contribute
+
+Any of the following; Python, Serpent 2
